@@ -9,9 +9,10 @@
   "keywords": [],
   "author": "Saugat",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "inquirer": "^12.1.0",
     "qr-image": "^3.2.0"
-  }
+  },
+  "devDependencies": {},
+  "description": ""
 }

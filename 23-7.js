@@ -20,8 +20,8 @@ inquirer
   })
   .catch((error) => {
     if (error.isTtyError) {
-      // Prompt couldn't be rendered in the current environment
+      console.log("error happened");
     } else {
-      // Something else went wrong
+      console.log("some other error happened.");
     }
   });
