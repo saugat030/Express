@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.render("index.ejs", { content: "Waiting for data..." });
 });
-//get secret route
+//get secret route:
 app.post("/get-secret", async (req, res) => {
   const searchId = req.body.id;
   try {
@@ -27,7 +27,7 @@ app.post("/get-secret", async (req, res) => {
     res.render("index.ejs", { content: JSON.stringify(error.response.data) });
   }
 });
-//post secret route
+//post secret route:
 app.post("/post-secret", async (req, res) => {
   try {
     const result = await axios.post(API_URL + "/secrets", req.body, config);
@@ -36,7 +36,7 @@ app.post("/post-secret", async (req, res) => {
     res.render("index.ejs", { content: JSON.stringify(error.response.data) });
   }
 });
-
+//Putting the req:
 app.post("/put-secret", async (req, res) => {
   const searchId = req.body.id;
   try {
@@ -50,7 +50,7 @@ app.post("/put-secret", async (req, res) => {
     res.render("index.ejs", { content: JSON.stringify(error.response.data) });
   }
 });
-
+//Patching:
 app.post("/patch-secret", async (req, res) => {
   const searchId = req.body.id;
   try {

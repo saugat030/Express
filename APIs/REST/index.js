@@ -37,23 +37,54 @@ app.post("/get-secret", async (req, res) => {
 
 //Posting the secret:
 app.post("/post-secret", async (req, res) => {
-  // TODO 2: Use axios to POST the data from req.body to the secrets api servers.
-  const data = {};
+  const formData = req.body;
+  try {
+    const result = await axios.post(API_URL + "/secrets", formData, config);
+    res.render("index.ejs", { content: JSON.stringify(result.data) }); //printing the data you just inputted through the post request. Yo chai API banauda handle garne ho aba post req aauda k response pathaune vanra yo api ko case ma chai tyo data return vayera aauxa.
+  } catch (error) {
+    console.log(error.message);
+  }
 });
 
+//Putting the secret.
 app.post("/put-secret", async (req, res) => {
   const searchId = req.body.id;
-  // TODO 3: Use axios to PUT the data from req.body to the secrets api servers.
+  const formData = req.body;
+  try {
+    const result = await axios.put(
+      API_URL + "/secrets/" + searchId,
+      formData,
+      config
+    );
+    res.render("index.ejs", { content: JSON.stringify(result.data) }); //printing the data you just inputted through the post request
+  } catch (error) {
+    console.log(error.message);
+    res.render("index.ejs", { content: JSON.stringify(error.response.data) });
+  }
 });
 
 app.post("/patch-secret", async (req, res) => {
   const searchId = req.body.id;
-  // TODO 4: Use axios to PATCH the data from req.body to the secrets api servers.
+  try {
+    const result = await axios.patch(
+      API_URL + "/secrets/" + searchId,
+      req.body,
+      config
+    );
+    res.render("index.ejs", { content: JSON.stringify(result.data) });
+  } catch (error) {
+    res.render("index.ejs", { content: JSON.stringify(error.response.data) });
+  }
 });
 
 app.post("/delete-secret", async (req, res) => {
   const searchId = req.body.id;
-  // TODO 5: Use axios to DELETE the item with searchId from the secrets api servers.
+  try {
+    const result = await axios.delete(API_URL + "/secrets/" + searchId, config); // You need to handle what comes in result.data after th delete request has been made. In this case a jsin fil with this type of message is sent -{"message":"Secret with ID 51 has been deleted successfully."}
+    res.render("index.ejs", { content: JSON.stringify(result.data) });
+  } catch (error) {
+    res.render("index.ejs", { content: JSON.stringify(error.response.data) });
+  }
 });
 
 app.listen(port, () => {
