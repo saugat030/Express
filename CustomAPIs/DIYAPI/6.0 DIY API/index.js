@@ -1,21 +1,24 @@
 import express, { response } from "express";
-import bodyParser from "body-parser";
 
 const app = express();
 const port = 3000;
 const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 //1. GET a random joke
 app.get("/random", (req, res) => {
+  console.log(data);
   res.json(jokes[Math.floor(Math.random() * 100)]);
 });
+
 //2. GET a specific joke
+
 app.get("/jokes/:id", (req, res) => {
-  let data = jokes.find((jok) => {
-    jok.id == req.params.id; //req.params can be used for accessing the parameters. req.params returns an object with key value pair.
-  });
+  let data = jokes.find(
+    (jok) => jok.id == parseInt(req.params.id) //req.params can be used for accessing the parameters. req.params returns an object with key value pair.
+  );
+  console.log(data);
   res.json(data);
 });
 
@@ -25,14 +28,43 @@ app.get("/filter", (req, res) => {
   const data = jokes.filter((joke) => {
     joke.jokeType == type;
   });
+  console.log(data);
   res.json(data);
 });
 
 //4. POST a new joke
+app.post("/jokes", (req, res) => {
+  let formData = {
+    id: jokes.length + 1,
+    jokeText: req.body.jokeText, //the "name" attribute needs to be same or if its different say , jname: , type : then req.body.jname etc.
+    jokeType: req.body.jokeType, //to tap into req.body need to express.urlencoded({extended:true})
+  };
+  jokes.push(formData);
+  console.log(jokes[jokes.length - 1]);
+  res.json(formData);
+});
 
 //5. PUT a joke
 
+app.put("/jokes/:id", (req, res) => {
+  let searchId = parseInt(req.params.id);
+  let jokeIndex = jokes.findIndex((newArr) => newArr.id == searchId);
+  jokes[jokeIndex] = {
+    ...jokes[jokeIndex],
+    jokeText: req.body.jokeText,
+    jokeType: req.body.jokeType,
+  };
+  res.json(newData);
+});
+
 //6. PATCH a joke
+app.patch("/jokes/:id", (req, res) => {
+  let searchId = parseInt(req.params.id);
+  let jokeIndex = jokes.findIndex((newArr) => newArr.id == searchId);
+  jokes[jokeIndex] = { ...jokes[jokeIndex], ...req.body };
+  console.log("updated joke: " + jokes[jokeIndex]);
+  res.json(jokes[jokeIndex]);
+});
 
 //7. DELETE Specific joke
 
