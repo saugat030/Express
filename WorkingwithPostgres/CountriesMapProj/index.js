@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 
 const app = express();
 const port = 3000;
+
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
@@ -17,7 +18,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
-  //Write your code here.
+  const result = await db.query("select * from visited_counties");
+  let arr = [];
+  if (result.rows) {
+    result.rows.forEach((item) => {
+      arr.push(item.country_code);
+    });
+    res.send("index.ejs", { countries: arr });
+  }
 });
 
 app.listen(port, () => {
