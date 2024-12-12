@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import pg from "pg";
 
 const app = express();
 const port = 3000;
@@ -18,13 +19,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
-  const result = await db.query("select * from visited_counties");
+  const result = await db.query("select * from visited_countries");
   let arr = [];
-  if (result.rows) {
+  if (result.rows.length > 0) {
+    //result.rows will alaways be an array and never null or undefunes. so it will always exist. Btter to check with .length
     result.rows.forEach((item) => {
       arr.push(item.country_code);
     });
-    res.send("index.ejs", { countries: arr });
+    res.render("index.ejs", { countries: arr, total: arr.length });
+  } else {
+    res.render("index.ejs", { error: "Not found." });
   }
 });
 
