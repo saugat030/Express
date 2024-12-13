@@ -32,7 +32,23 @@ app.get("/", async (req, res) => {
     db.end();
   }
 });
-app.post();
+
+//The post request:
+app.post("/add", async (req, res) => {
+  const inputValue = req.body.country;
+  const fetchedRow = await db.query(
+    "select country_code from countries where country_name = ($1)",
+    [inputValue]
+  );
+
+  if (fetchedRow.rows.length !== 0) {
+    const code = fetchedRow.rows[0].country_code;
+    await db.query("insert into visited_countries (country_code) values ($1)", [
+      code,
+    ]);
+    res.redirect("/");
+  }
+});
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
