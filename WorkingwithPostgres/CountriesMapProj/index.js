@@ -18,37 +18,61 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.get("/", async (req, res) => {
-  const result = await db.query("select * from visited_countries"); //could do a select country_code from visited_countries.
-  let arr = [];
+async function checkVisisted() {
+  const result = await db.query("SELECT country_code FROM visited_countries"); //could do a select all from visited_countries.
+  let countries = [];
   if (result.rows.length > 0) {
     //result.rows will always be an array and never null or undefine. so it will always exist. Btter to check with .length
     result.rows.forEach((item) => {
-      arr.push(item.country_code);
+      countries.push(country.country_code);
     });
-    res.render("index.ejs", { countries: arr, total: arr.length });
-  } else {
-    res.render("index.ejs", { error: "No data in the array" });
-    db.end();
+    return countries;
   }
+}
+
+app.get("/", async (req, res) => {
+  const result = await checkVisisted();
+  res.render("index.ejs", { countries: countries, total: countries.length });
 });
 
 //The post request:
 app.post("/add", async (req, res) => {
   const inputValue = req.body.country;
-  const fetchedRow = await db.query(
-    "select country_code from countries where country_name = ($1)",
-    [inputValue]
-  );
-
-  if (fetchedRow.rows.length !== 0) {
-    const code = fetchedRow.rows[0].country_code;
-    await db.query("insert into visited_countries (country_code) values ($1)", [
-      code,
-    ]);
-    res.redirect("/");
+  // console.log(inputValue);
+  try {
+    const fetchedRow = await db.query(
+      "select country_code from countries where country_name = ($1)", //select never throws an exception if a data is not found. Only when the name of the table itself is wrong so ya aako error catch block le catch handaina.
+      [inputValue]
+    );
+    try {
+      const code = fetchedRow.rows[0].country_code;
+      await db.query(
+        "insert into visited_countries (country_code) values ($1)",
+        [code]
+      );
+      res.redirect("/");
+    } catch (error) {
+      //catch for if we try to enter repeated data.
+      console.log(error);
+      const countries = await checkVisisted();
+      res.render("index.ejs", {
+        countries: countries,
+        total: countries.length,
+        error: "Country already added. Error :" + error,
+      });
+    }
+  } catch (error) {
+    //catch for if the Cpuntry name doesnt exist.
+    console.log(error);
+    const countries = await checkVisisted();
+    res.render("index.ejs", {
+      countries: countries,
+      total: countries.length,
+      error: "Country name doesn't exist :" + error,
+    });
   }
 });
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
