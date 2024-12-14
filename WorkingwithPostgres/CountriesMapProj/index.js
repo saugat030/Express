@@ -24,7 +24,7 @@ async function checkVisisted() {
   if (result.rows.length > 0) {
     //result.rows will always be an array and never null or undefine. so it will always exist. Btter to check with .length
     result.rows.forEach((item) => {
-      countries.push(country.country_code);
+      countries.push(item.country_code);
     });
     return countries;
   }
@@ -32,7 +32,7 @@ async function checkVisisted() {
 
 app.get("/", async (req, res) => {
   const result = await checkVisisted();
-  res.render("index.ejs", { countries: countries, total: countries.length });
+  res.render("index.ejs", { countries: result, total: result.length });
 });
 
 //The post request:
