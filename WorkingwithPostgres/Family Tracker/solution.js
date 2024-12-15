@@ -19,10 +19,7 @@ app.use(express.static("public"));
 
 let currentUserId = 1;
 
-// let users = [
-//   { id: 1, name: "Angela", color: "teal" },
-//   { id: 2, name: "Jack", color: "powderblue" },
-// ];
+let users = [];
 
 async function checkVisisted() {
   const result = await db.query(
