@@ -15,15 +15,13 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-let items = [];
-
 app.get("/", async (req, res) => {
   try {
     console.log("Fetching items from database...");
     const result = await db.query("SELECT * FROM items");
     console.log(`Query executed, rows returned: ${result.rows.length}`);
     if (result.rows.length > 0) {
-      items = result.rows;
+      let items = result.rows;
       res.render("index.ejs", {
         listTitle: "Today",
         listItems: items,
@@ -38,9 +36,14 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.post("/add", (req, res) => {
+app.post("/add", async (req, res) => {
   const inputValue = req.body.newItem;
-  items.push({ title: item });
+  try {
+    await db.query("insert into items (title) values ($1)", [inputValue]);
+    console.log("inserted successfully");
+  } catch (error) {
+    console.log("Error has occured : " + error.message);
+  }
   res.redirect("/");
 });
 
