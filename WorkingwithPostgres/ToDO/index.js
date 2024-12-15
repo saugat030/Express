@@ -1,8 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
-
+import pg from "pg";
 const app = express();
 const port = 3000;
+
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
@@ -10,7 +11,7 @@ const db = new pg.Client({
   password: "12345678",
   port: 5432,
 });
-
+db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
@@ -18,7 +19,9 @@ let items = [];
 
 app.get("/", async (req, res) => {
   try {
+    console.log("Fetching items from database...");
     const result = await db.query("SELECT * FROM items");
+    console.log(`Query executed, rows returned: ${result.rows.length}`);
     if (result.rows.length > 0) {
       items = result.rows;
       res.render("index.ejs", {
@@ -27,15 +30,16 @@ app.get("/", async (req, res) => {
       });
     } else {
       console.log("No data found.");
+      res.send("Data couldn't be found.");
     }
   } catch (error) {
     console.log(error.message);
-    res.redirect("/");
+    res.send("Error has happened brthr");
   }
 });
 
 app.post("/add", (req, res) => {
-  const item = req.body.newItem;
+  const inputValue = req.body.newItem;
   items.push({ title: item });
   res.redirect("/");
 });
