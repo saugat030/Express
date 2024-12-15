@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
-
+// This code needs an update.
 const app = express();
 const port = 3000;
 
