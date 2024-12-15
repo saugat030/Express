@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
-// This code needs an update.
+
 const app = express();
 const port = 3000;
 
@@ -9,7 +9,7 @@ const db = new pg.Client({
   user: "postgres",
   host: "localhost",
   database: "world",
-  password: "12345678",
+  password: "123456",
   port: 5432,
 });
 db.connect();
@@ -19,7 +19,10 @@ app.use(express.static("public"));
 
 let currentUserId = 1;
 
-let users = [];
+let users = [
+  { id: 1, name: "Angela", color: "teal" },
+  { id: 2, name: "Jack", color: "powderblue" },
+];
 
 async function checkVisisted() {
   const result = await db.query(
@@ -49,7 +52,6 @@ app.get("/", async (req, res) => {
     color: currentUser.color,
   });
 });
-
 app.post("/add", async (req, res) => {
   const input = req.body["country"];
   const currentUser = await getCurrentUser();
