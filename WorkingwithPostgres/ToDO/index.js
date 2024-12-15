@@ -17,9 +17,9 @@ app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
   try {
-    console.log("Fetching items from database...");
+    console.log("GET: Fetching items from database...");
     const result = await db.query("SELECT * FROM items");
-    console.log(`Query executed, rows returned: ${result.rows.length}`);
+    // console.log(`Query executed, rows returned: ${result.rows.length}`);
     if (result.rows.length > 0) {
       let items = result.rows;
       res.render("index.ejs", {
@@ -47,7 +47,21 @@ app.post("/add", async (req, res) => {
   res.redirect("/");
 });
 
-app.post("/edit", (req, res) => {});
+app.post("/edit", async (req, res) => {
+  const inputId = req.body.updatedItemId;
+  const inputValue = req.body.updatedItemTitle;
+  console.log(inputId, inputValue);
+  try {
+    await db.query("update items set title = '($1)' where id = ($2)", [
+      inputValue.trim(),
+      inputId,
+    ]);
+    res.redirect("/");
+  } catch (error) {
+    console.log("Error in updating databse: " + error.message);
+    res.send("Error updating the database.....");
+  }
+});
 
 app.post("/delete", (req, res) => {});
 
