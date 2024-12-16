@@ -57,6 +57,24 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
+  try {
+    result = await db.query("select * from users where email = ($1)", [
+      username,
+    ]);
+    if (result.rows.length > 0) {
+      const resultPassword = result.rows[0].password;
+      if (password == resultPassword) {
+        res.status(201).render("secrets.ejs");
+      } else {
+        res.send("Password incorrect.");
+      }
+    } else {
+      res.status(404).send("User doesnot exist. Try registering.");
+    }
+  } catch (err) {
+    console.log("error has occured: " + err.message);
+    res.send(err.message);
+  }
 });
 
 app.listen(port, () => {
