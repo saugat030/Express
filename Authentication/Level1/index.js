@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 
+//READ THE COMMENTS BEFORE EXECUTING THIS PROGRAM........
+
 const app = express();
 const port = 3000;
 
@@ -38,6 +40,7 @@ app.post("/register", async (req, res) => {
       username,
     ]);
     if (result.rows.length == 0) {
+      //Level 2 security ko hash algorithm ko password ra yo password le same table use garxa so the person registered through this may not work for level 2 project and vice versa.
       const insertedData = await db.query(
         "insert into users (email , password) values ($1,$2)",
         [username, password]

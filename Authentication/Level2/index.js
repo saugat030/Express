@@ -3,6 +3,8 @@ import bodyParser from "body-parser";
 import pg from "pg";
 import bcrypt from "bcrypt";
 
+//Password of haseduser@mail.com is 12345678. (For testing purposes).
+
 const app = express();
 const port = 3000;
 const saltRounds = 10;
@@ -65,9 +67,10 @@ app.post("/register", async (req, res) => {
   }
 });
 
+//Login Post route:
 app.post("/login", async (req, res) => {
   const email = req.body.username;
-  const password = req.body.password;
+  const loginpassword = req.body.password;
 
   try {
     const result = await db.query("SELECT * FROM users WHERE email = $1", [
@@ -77,11 +80,18 @@ app.post("/login", async (req, res) => {
       const user = result.rows[0];
       const storedPassword = user.password;
 
-      if (password === storedPassword) {
-        res.render("secrets.ejs");
-      } else {
-        res.send("Incorrect Password");
-      }
+      bcrypt.compare(loginpassword, storedPassword, (err, result) => {
+        //the order of the .compare() matters so the loginpassword must be in the beginning.
+        if (err) {
+          console.log(err);
+        } else {
+          if (result) {
+            res.render("secrets.ejs");
+          } else {
+            res.send("Incorrect Password.");
+          }
+        }
+      });
     } else {
       res.send("User not found");
     }
