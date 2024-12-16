@@ -54,7 +54,7 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const email = req.body.email;
+  const email = req.body.username;
   const password = req.body.password;
 
   try {
