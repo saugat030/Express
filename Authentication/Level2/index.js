@@ -1,15 +1,18 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import bcrypt from "bcrypt";
 
 const app = express();
 const port = 3000;
+const saltRounds = 10;
+//Password + salt ----hashfunction----> hash value -> hash value + salt ----hashfunction----> new hash value -> new hash value + salt ----hashfunction----> new hash value .....estai 10 ota rounds hunxa aba bcrypt function ma chai.
 
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
   database: "secrets",
-  password: "123456",
+  password: "12345678",
   port: 5432,
 });
 db.connect();
@@ -29,24 +32,33 @@ app.get("/register", (req, res) => {
   res.render("register.ejs");
 });
 
+//register Post route:
 app.post("/register", async (req, res) => {
   const email = req.body.username;
   const password = req.body.password;
-
   try {
+    //check if the user is already registered.
     const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
-
     if (checkResult.rows.length > 0) {
       res.send("Email already exists. Try logging in.");
     } else {
-      const result = await db.query(
-        "INSERT INTO users (email, password) VALUES ($1, $2)",
-        [email, password]
-      );
-      console.log(result);
-      res.render("secrets.ejs");
+      //hash the password before sending it to the db.
+
+      bcrypt.hash(password, saltRounds, async (err, hashValue) => {
+        if (err) {
+          console.log(err);
+        } else {
+          const result = await db.query(
+            "INSERT INTO users (email, password) VALUES ($1, $2)", //This time we send the hashValue instead of the actual password.
+            [email, hashValue]
+          );
+          // console.log(result);
+          res.render("secrets.ejs");
+        }
+      });
+      //if user not registered then enter the values in the db.
     }
   } catch (err) {
     console.log(err);
